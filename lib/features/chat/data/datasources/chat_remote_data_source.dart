@@ -5,23 +5,23 @@ import '../models/message_model.dart';
 
 abstract class ChatRemoteDataSource {
   Stream<MessageModel> get messageStream;
-  Stream<bool> get typingStream;
+  Stream<Map<String, dynamic>> get typingStream;
   void connect();
   void disconnect();
   void sendMessage(String text, String username);
-  void sendTyping(bool isTyping);
+  void sendTyping(bool isTyping, String username);
 }
 
 class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
   late IO.Socket _socket;
   final _messageController = StreamController<MessageModel>.broadcast();
-  final _typingController = StreamController<bool>.broadcast();
+  final _typingController = StreamController<Map<String, dynamic>>.broadcast();
 
   @override
   Stream<MessageModel> get messageStream => _messageController.stream;
 
   @override
-  Stream<bool> get typingStream => _typingController.stream;
+  Stream<Map<String, dynamic>> get typingStream => _typingController.stream;
 
   @override
   void connect() {
@@ -73,7 +73,7 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
     _socket.on('typing_status', (data) {
       try {
         if (data is Map) {
-          _typingController.add(data['isTyping'] ?? false);
+          _typingController.add(Map<String, dynamic>.from(data));
         }
       } catch (e) {
         print("Typing error: $e");
@@ -91,9 +91,12 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
   }
 
   @override
-  void sendTyping(bool isTyping) {
+  void sendTyping(bool isTyping, String username) {
     if (_socket.connected) {
-      _socket.emit('typing', {'isTyping': isTyping});
+      _socket.emit('typing', {
+        'isTyping': isTyping,
+        'username': username,
+      });
     }
   }
 

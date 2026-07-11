@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import '../../../../core/service_locator.dart';
 import '../../domain/entities/message_entity.dart';
 import '../contract/chat_contract.dart';
 import '../presenter/chat_presenter.dart';
+import '../widgets/message_bubble.dart';
 
 class ChatPage extends StatefulWidget {
   // 1. UPDATE: Add username field
@@ -26,7 +26,7 @@ class _ChatPageState extends State<ChatPage> implements ChatView {
 
   // State
   final List<MessageEntity> _messages = [];
-  bool _isOtherUserTyping = false;
+  String? _typingStatusText;
 
   @override
   void initState() {
@@ -68,11 +68,11 @@ class _ChatPageState extends State<ChatPage> implements ChatView {
   }
 
   @override
-  void updateTypingStatus(bool isTyping) {
+  void updateTypingStatus(String? typingStatusText) {
     setState(() {
-      _isOtherUserTyping = isTyping;
+      _typingStatusText = typingStatusText;
     });
-    if (isTyping) _scrollToBottom();
+    if (typingStatusText != null) _scrollToBottom();
   }
   // ---------------------------
 
@@ -117,40 +117,54 @@ class _ChatPageState extends State<ChatPage> implements ChatView {
           Expanded(
             child: ListView.builder(
               controller: _scrollController,
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
               itemCount: _messages.length,
               itemBuilder: (context, index) {
                 final msg = _messages[index];
                 final isMe = msg.sender == _presenter.currentUsername;
-                return _buildMessageBubble(msg, isMe);
+                return MessageBubble(message: msg, isMe: isMe);
               },
             ),
           ),
 
           // Typing Indicator
-          if (_isOtherUserTyping)
+          if (_typingStatusText != null)
             Padding(
               padding: const EdgeInsets.only(left: 20, bottom: 10),
               child: Align(
                 alignment: Alignment.centerLeft,
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(20),
+                    color: Colors.white.withOpacity(0.9),
+                    borderRadius: BorderRadius.circular(16),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.04),
+                        blurRadius: 2,
+                        offset: const Offset(0, 1),
+                      ),
+                    ],
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
-                    children: const [
-                      SizedBox(
-                          width: 12,
-                          height: 12,
-                          child: CircularProgressIndicator(strokeWidth: 2)
+                    children: [
+                      const SizedBox(
+                        width: 10,
+                        height: 10,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 1.5,
+                          color: Color(0xFF008069),
+                        ),
                       ),
-                      SizedBox(width: 8),
+                      const SizedBox(width: 8),
                       Text(
-                        "Someone is typing...",
-                        style: TextStyle(color: Colors.grey, fontSize: 12, fontStyle: FontStyle.italic),
+                        _typingStatusText!,
+                        style: const TextStyle(
+                          color: Colors.black54,
+                          fontSize: 12,
+                          fontStyle: FontStyle.italic,
+                        ),
                       ),
                     ],
                   ),
@@ -165,101 +179,71 @@ class _ChatPageState extends State<ChatPage> implements ChatView {
     );
   }
 
-  Widget _buildMessageBubble(MessageEntity msg, bool isMe) {
-    return Align(
-      alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
-      child: ConstrainedBox(
-        constraints: BoxConstraints(
-          maxWidth: MediaQuery.of(context).size.width * 0.75,
-        ),
-        child: Container(
-          margin: const EdgeInsets.symmetric(vertical: 4),
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-          decoration: BoxDecoration(
-            color: isMe ? const Color(0xFFE7FFDB) : Colors.white,
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.05),
-                blurRadius: 2,
-                offset: const Offset(0, 1),
-              )
-            ],
-            borderRadius: BorderRadius.only(
-              topLeft: const Radius.circular(12),
-              topRight: const Radius.circular(12),
-              bottomLeft: isMe ? const Radius.circular(12) : Radius.zero,
-              bottomRight: isMe ? Radius.zero : const Radius.circular(12),
-            ),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              if (!isMe)
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 4.0),
-                  child: Text(
-                    msg.sender,
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.orange[800],
-                    ),
-                  ),
-                ),
-              Text(
-                msg.text,
-                style: const TextStyle(fontSize: 16, color: Colors.black87),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                DateFormat('hh:mm a').format(msg.time),
-                style: TextStyle(
-                  fontSize: 10,
-                  color: Colors.black.withOpacity(0.5),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
   Widget _buildInputArea() {
     return Container(
-      padding: const EdgeInsets.all(8.0),
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 4)],
+      padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
+      decoration: BoxDecoration(
+        color: Colors.grey[50],
+        border: Border(
+          top: BorderSide(color: Colors.grey[200]!, width: 1),
+        ),
       ),
       child: SafeArea(
         child: Row(
           children: [
-            IconButton(
-              icon: const Icon(Icons.emoji_emotions_outlined, color: Colors.grey),
-              onPressed: () {},
-            ),
             Expanded(
-              child: TextField(
-                controller: _textController,
-                onChanged: (text) => _presenter.onTextChanged(text),
-                decoration: const InputDecoration(
-                  hintText: "Type a message...",
-                  border: InputBorder.none,
-                  contentPadding: EdgeInsets.symmetric(horizontal: 8),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(24),
+                  border: Border.all(color: Colors.grey[300]!, width: 1),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.02),
+                      blurRadius: 3,
+                      offset: const Offset(0, 1),
+                    ),
+                  ],
+                ),
+                child: Row(
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.emoji_emotions_outlined, color: Colors.grey),
+                      onPressed: () {},
+                    ),
+                    Expanded(
+                      child: TextField(
+                        controller: _textController,
+                        onChanged: (text) => _presenter.onTextChanged(text),
+                        decoration: const InputDecoration(
+                          hintText: "Type a message...",
+                          border: InputBorder.none,
+                          contentPadding: EdgeInsets.symmetric(horizontal: 8),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
             const SizedBox(width: 8),
-            FloatingActionButton(
-              mini: true,
-              backgroundColor: const Color(0xFF008069),
-              elevation: 0,
-              onPressed: () {
+            GestureDetector(
+              onTap: () {
                 _presenter.sendMessage(_textController.text);
                 _textController.clear();
               },
-              child: const Icon(Icons.send, color: Colors.white, size: 18),
+              child: Container(
+                padding: const EdgeInsets.all(12),
+                decoration: const BoxDecoration(
+                  color: Color(0xFF008069),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.send,
+                  color: Colors.white,
+                  size: 18,
+                ),
+              ),
             ),
           ],
         ),

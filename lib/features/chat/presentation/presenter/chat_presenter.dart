@@ -13,6 +13,7 @@ class ChatPresenterImpl implements ChatPresenter {
 
   // 1. UPDATE: Changed to 'late' because we set it in initChat()
   late String _username;
+  final Set<String> _typingUsers = {};
 
   ChatPresenterImpl({required this.repository});
 
@@ -47,9 +48,33 @@ class ChatPresenterImpl implements ChatPresenter {
     });
 
     // Listen to Typing Status
-    _typingSubscription = repository.typingStream.listen((isTyping) {
-      _view?.updateTypingStatus(isTyping);
+    _typingSubscription = repository.typingStream.listen((data) {
+      final isTyping = data['isTyping'] as bool? ?? false;
+      final typingUsername = data['username'] as String? ?? '';
+
+      // Ignore our own typing events
+      if (typingUsername.isEmpty || typingUsername == _username) return;
+
+      if (isTyping) {
+        _typingUsers.add(typingUsername);
+      } else {
+        _typingUsers.remove(typingUsername);
+      }
+
+      _notifyTypingStatus();
     });
+  }
+
+  void _notifyTypingStatus() {
+    if (_typingUsers.isEmpty) {
+      _view?.updateTypingStatus(null);
+    } else if (_typingUsers.length == 1) {
+      _view?.updateTypingStatus("${_typingUsers.first} is typing...");
+    } else if (_typingUsers.length == 2) {
+      _view?.updateTypingStatus("${_typingUsers.first} and ${_typingUsers.last} are typing...");
+    } else {
+      _view?.updateTypingStatus("Several people are typing...");
+    }
   }
 
   @override
@@ -67,17 +92,17 @@ class ChatPresenterImpl implements ChatPresenter {
       repository.sendMessage(text, _username);
 
       // Reset Typing Logic
-      repository.sendTyping(false);
+      repository.sendTyping(false, _username);
       _typingTimer?.cancel();
     }
   }
 
   @override
   void onTextChanged(String text) {
-    repository.sendTyping(true);
+    repository.sendTyping(true, _username);
     _typingTimer?.cancel();
     _typingTimer = Timer(const Duration(seconds: 2), () {
-      repository.sendTyping(false);
+      repository.sendTyping(false, _username);
     });
   }
 

@@ -2,7 +2,7 @@ import '../../domain/entities/message_entity.dart';
 
 abstract class ChatView {
   void showNewMessage(MessageEntity message);
-  void updateTypingStatus(bool isTyping);
+  void updateTypingStatus(String? typingStatusText);
 }
 
 abstract class ChatPresenter {

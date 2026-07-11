@@ -12,7 +12,7 @@ class ChatRepositoryImpl implements ChatRepository {
 
   // 1. NEW: Expose the typing stream from the data source
   @override
-  Stream<bool> get typingStream => remoteDataSource.typingStream;
+  Stream<Map<String, dynamic>> get typingStream => remoteDataSource.typingStream;
 
   @override
   void connect() => remoteDataSource.connect();
@@ -26,5 +26,6 @@ class ChatRepositoryImpl implements ChatRepository {
 
   // 2. NEW: Implement the sendTyping method
   @override
-  void sendTyping(bool isTyping) => remoteDataSource.sendTyping(isTyping);
+  void sendTyping(bool isTyping, String username) =>
+      remoteDataSource.sendTyping(isTyping, username);
 }
