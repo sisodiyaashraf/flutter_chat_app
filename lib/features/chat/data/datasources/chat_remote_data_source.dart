@@ -1,6 +1,9 @@
 import 'dart:async';
-import 'dart:convert'; // Import this for JSON decoding
+import 'dart:convert'; // For JSON decoding
+import 'package:flutter/foundation.dart'; // For debugPrint and kDebugMode
 import 'package:socket_io_client/socket_io_client.dart' as IO;
+import 'package:uuid/uuid.dart';
+import '../../../core/config.dart';
 import '../models/message_model.dart';
 
 abstract class ChatRemoteDataSource {
@@ -25,69 +28,65 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
 
   @override
   void connect() {
-    print("🔄 Connecting to Python Server...");
+    if (kDebugMode) debugPrint('🔄 Connecting to Python Server...');
 
-    // 1. Connection Logic
-    _socket = IO.io('http://10.0.2.2:5000', IO.OptionBuilder()
+    _socket = IO.io(AppConfig.serverUrl, IO.OptionBuilder()
         .setTransports(['websocket'])
         .disableAutoConnect()
         .build());
 
     _socket.connect();
 
-    _socket.onConnect((_) => print('✅ Socket Connected to Python Server'));
-    _socket.onDisconnect((_) => print('❌ Socket Disconnected'));
+    _socket.onConnect((_) {
+      if (kDebugMode) debugPrint('✅ Socket Connected to Python Server');
+    });
+    _socket.onDisconnect((_) {
+      if (kDebugMode) debugPrint('❌ Socket Disconnected');
+    });
 
-    // 2. SAFE MESSAGE LISTENER (The Fix)
+    // Safe message listener
     _socket.on('receive_message', (data) {
-      print("🔔 Flutter Received Data: $data");
-
+      if (kDebugMode) debugPrint('🔔 Flutter Received Data: $data');
       try {
         Map<String, dynamic> safeMap;
-
-        // SCENARIO A: Data is already a Map (Normal)
         if (data is Map) {
           safeMap = Map<String, dynamic>.from(data);
-        }
-        // SCENARIO B: Data is a String (Sometimes happens from Web)
-        else if (data is String) {
-          print("⚠️ Received String, attempting to parse JSON...");
+        } else if (data is String) {
+          if (kDebugMode) debugPrint('⚠️ Received String, attempting to parse JSON...');
           safeMap = jsonDecode(data);
-        }
-        // SCENARIO C: Unknown
-        else {
-          print("⚠️ Unknown data type: ${data.runtimeType}");
+        } else {
+          if (kDebugMode) debugPrint('⚠️ Unknown data type: ${data.runtimeType}');
           return;
         }
-
         final messageModel = MessageModel.fromJson(safeMap);
         _messageController.add(messageModel);
-        print("✅ Message processed and sent to UI");
-
+        if (kDebugMode) debugPrint('✅ Message processed and sent to UI');
       } catch (e) {
-        print("❌ ERROR processing message: $e");
+        if (kDebugMode) debugPrint('❌ ERROR processing message: $e');
       }
     });
 
-    // 3. SAFE TYPING LISTENER
+    // Safe typing listener
     _socket.on('typing_status', (data) {
       try {
         if (data is Map) {
           _typingController.add(Map<String, dynamic>.from(data));
         }
       } catch (e) {
-        print("Typing error: $e");
+        if (kDebugMode) debugPrint('Typing error: $e');
       }
     });
   }
 
   @override
   void sendMessage(String text, String username) {
-    _socket.emit('send_message', {
+    final payload = {
+      'id': const Uuid().v4(),
       'text': text,
       'sender': username,
       'time': DateTime.now().toIso8601String(),
-    });
+    };
+    _socket.emit('send_message', payload);
   }
 
   @override
@@ -105,7 +104,6 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
     try {
       if (_socket.connected) _socket.disconnect();
     } catch (e) {}
-    _messageController.close();
-    _typingController.close();
+    // Do NOT close stream controllers here; they are managed by the repository/provider lifecycle.
   }
 }

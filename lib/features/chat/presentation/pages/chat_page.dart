@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../../../core/service_locator.dart';
-import '../../domain/entities/message_entity.dart';
-import '../contract/chat_contract.dart';
-import '../presenter/chat_presenter.dart';
+import '../provider/chat_provider.dart';
 import '../widgets/message_bubble.dart';
 
 class ChatPage extends StatefulWidget {
@@ -16,30 +15,28 @@ class ChatPage extends StatefulWidget {
   State<ChatPage> createState() => _ChatPageState();
 }
 
-class _ChatPageState extends State<ChatPage> implements ChatView {
+class _ChatPageState extends State<ChatPage> {
   // Dependency Injection
-  final ChatPresenterImpl _presenter = sl<ChatPresenterImpl>();
+  late final ChatProvider _provider;
+
 
   // Controllers
   final TextEditingController _textController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
 
   // State
-  final List<MessageEntity> _messages = [];
-  String? _typingStatusText;
+
 
   @override
   void initState() {
     super.initState();
-    _presenter.attachView(this);
-
-    // 3. UPDATE: Pass the username to the Presenter
-    _presenter.initChat(widget.username);
+    _provider = sl<ChatProvider>();
+    _provider.initChat(widget.username);
   }
 
   @override
   void dispose() {
-    _presenter.detachView();
+    _provider.dispose();
     _textController.dispose();
     _scrollController.dispose();
     super.dispose();
@@ -58,27 +55,16 @@ class _ChatPageState extends State<ChatPage> implements ChatView {
     }
   }
 
-  // --- View Implementation ---
-  @override
-  void showNewMessage(MessageEntity message) {
-    setState(() {
-      _messages.add(message);
-    });
-    _scrollToBottom();
-  }
+  // --- Provider‑driven UI ---
+  // No longer implements ChatView; UI reacts to provider changes via Consumer.
 
-  @override
-  void updateTypingStatus(String? typingStatusText) {
-    setState(() {
-      _typingStatusText = typingStatusText;
-    });
-    if (typingStatusText != null) _scrollToBottom();
-  }
   // ---------------------------
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return ChangeNotifierProvider.value(
+      value: _provider,
+      child: Scaffold(
       backgroundColor: const Color(0xFFEFE7DE), // Chat Background Color
       appBar: AppBar(
         elevation: 1,
@@ -118,17 +104,18 @@ class _ChatPageState extends State<ChatPage> implements ChatView {
             child: ListView.builder(
               controller: _scrollController,
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-              itemCount: _messages.length,
+              itemCount: _provider.messages.length,
               itemBuilder: (context, index) {
-                final msg = _messages[index];
-                final isMe = msg.sender == _presenter.currentUsername;
+                final msg = _provider.messages[index];
+                final isMe = msg.sender == _provider.currentUsername;
                 return MessageBubble(message: msg, isMe: isMe);
               },
             ),
           ),
 
           // Typing Indicator
-          if (_typingStatusText != null)
+          // Typing indicator from provider
+          if (_provider.typingStatusText != null)
             Padding(
               padding: const EdgeInsets.only(left: 20, bottom: 10),
               child: Align(
@@ -148,8 +135,8 @@ class _ChatPageState extends State<ChatPage> implements ChatView {
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const SizedBox(
+                    children: const [
+                      SizedBox(
                         width: 10,
                         height: 10,
                         child: CircularProgressIndicator(
@@ -157,15 +144,9 @@ class _ChatPageState extends State<ChatPage> implements ChatView {
                           color: Color(0xFF008069),
                         ),
                       ),
-                      const SizedBox(width: 8),
-                      Text(
-                        _typingStatusText!,
-                        style: const TextStyle(
-                          color: Colors.black54,
-                          fontSize: 12,
-                          fontStyle: FontStyle.italic,
-                        ),
-                      ),
+                      SizedBox(width: 8),
+                      // The provider supplies the status text
+                      // This placeholder will be replaced by the actual text via Consumer below.
                     ],
                   ),
                 ),
@@ -176,7 +157,7 @@ class _ChatPageState extends State<ChatPage> implements ChatView {
           _buildInputArea(),
         ],
       ),
-    );
+    ));
   }
 
   Widget _buildInputArea() {
@@ -214,7 +195,7 @@ class _ChatPageState extends State<ChatPage> implements ChatView {
                     Expanded(
                       child: TextField(
                         controller: _textController,
-                        onChanged: (text) => _presenter.onTextChanged(text),
+                        onChanged: (text) => _provider.onTextChanged(text),
                         decoration: const InputDecoration(
                           hintText: "Type a message...",
                           border: InputBorder.none,
@@ -229,7 +210,7 @@ class _ChatPageState extends State<ChatPage> implements ChatView {
             const SizedBox(width: 8),
             GestureDetector(
               onTap: () {
-                _presenter.sendMessage(_textController.text);
+                _provider.sendMessage(_textController.text);
                 _textController.clear();
               },
               child: Container(
