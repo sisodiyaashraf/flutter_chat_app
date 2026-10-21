@@ -2,28 +2,6 @@ import 'package:flutter/material.dart';
 import '../../provider/chat_provider.dart';
 import '../widgets/message_bubble.dart';
 
-/// Displays the list of chat messages.
-class MessageList extends StatelessWidget {
-  final ChatProvider provider;
-  final ScrollController scrollController;
-  const MessageList({required this.provider, required this.scrollController, super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Expanded(
-      child: ListView.builder(
-        controller: scrollController,
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-        itemCount: provider.messages.length,
-        itemBuilder: (context, index) {
-          final msg = provider.messages[index];
-          final isMe = msg.sender == provider.currentUsername;
-          return MessageBubble(message: msg, isMe: isMe);
-        },
-      ),
-    );
-  }
-}
 
 import 'package:provider/provider.dart';
 import '../../provider/chat_provider.dart';

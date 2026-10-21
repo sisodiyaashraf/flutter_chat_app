@@ -4,6 +4,8 @@ import '../../../../core/service_locator.dart';
 import '../provider/chat_provider.dart';
 import '../widgets/message_bubble.dart';
 import '../widgets/message_list.dart';
+import '../widgets/typing_indicator.dart';
+import '../widgets/chat_input_area.dart';
 
 class ChatPage extends StatefulWidget {
   // 1. UPDATE: Add username field
@@ -23,7 +25,6 @@ class _ChatPageState extends State<ChatPage> {
 
   // Controllers
   final TextEditingController _textController = TextEditingController();
-  final ScrollController _scrollController = ScrollController();
 
   // State
 
@@ -39,16 +40,16 @@ class _ChatPageState extends State<ChatPage> {
   void dispose() {
     _provider.dispose();
     _textController.dispose();
-    _scrollController.dispose();
+    // Provider handles scrollController disposal
     super.dispose();
   }
 
   void _scrollToBottom() {
-    if (_scrollController.hasClients) {
-      // Small delay to ensure the list has rendered the new item
+    final controller = _provider.scrollController;
+    if (controller.hasClients) {
       Future.delayed(const Duration(milliseconds: 100), () {
-        _scrollController.animateTo(
-          _scrollController.position.maxScrollExtent,
+        controller.animateTo(
+          controller.position.maxScrollExtent,
           duration: const Duration(milliseconds: 300),
           curve: Curves.easeOut,
         );
@@ -161,75 +162,5 @@ class _ChatPageState extends State<ChatPage> {
     ));
   }
 
-  Widget _buildInputArea() {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
-      decoration: BoxDecoration(
-        color: Colors.grey[50],
-        border: Border(
-          top: BorderSide(color: Colors.grey[200]!, width: 1),
-        ),
-      ),
-      child: SafeArea(
-        child: Row(
-          children: [
-            Expanded(
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(24),
-                  border: Border.all(color: Colors.grey[300]!, width: 1),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.02),
-                      blurRadius: 3,
-                      offset: const Offset(0, 1),
-                    ),
-                  ],
-                ),
-                child: Row(
-                  children: [
-                    IconButton(
-                      icon: const Icon(Icons.emoji_emotions_outlined, color: Colors.grey),
-                      onPressed: () {},
-                    ),
-                    Expanded(
-                      child: TextField(
-                        controller: _textController,
-                        onChanged: (text) => _provider.onTextChanged(text),
-                        decoration: const InputDecoration(
-                          hintText: "Type a message...",
-                          border: InputBorder.none,
-                          contentPadding: EdgeInsets.symmetric(horizontal: 8),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            const SizedBox(width: 8),
-            GestureDetector(
-              onTap: () {
-                _provider.sendMessage(_textController.text);
-                _textController.clear();
-              },
-              child: Container(
-                padding: const EdgeInsets.all(12),
-                decoration: const BoxDecoration(
-                  color: Color(0xFF008069),
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(
-                  Icons.send,
-                  color: Colors.white,
-                  size: 18,
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+
 }
