@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../../core/service_locator.dart';
 import '../provider/chat_provider.dart';
-import '../widgets/message_bubble.dart';
+
 import '../widgets/message_list.dart';
 import '../widgets/typing_indicator.dart';
 import '../widgets/chat_input_area.dart';
@@ -24,7 +24,7 @@ class _ChatPageState extends State<ChatPage> {
 
 
   // Controllers
-  final TextEditingController _textController = TextEditingController();
+
 
   // State
 
@@ -39,23 +39,11 @@ class _ChatPageState extends State<ChatPage> {
   @override
   void dispose() {
     _provider.dispose();
-    _textController.dispose();
+
     // Provider handles scrollController disposal
     super.dispose();
   }
 
-  void _scrollToBottom() {
-    final controller = _provider.scrollController;
-    if (controller.hasClients) {
-      Future.delayed(const Duration(milliseconds: 100), () {
-        controller.animateTo(
-          controller.position.maxScrollExtent,
-          duration: const Duration(milliseconds: 300),
-          curve: Curves.easeOut,
-        );
-      });
-    }
-  }
 
   // --- Provider‑driven UI ---
   // No longer implements ChatView; UI reacts to provider changes via Consumer.
@@ -101,62 +89,12 @@ class _ChatPageState extends State<ChatPage> {
       ),
       body: Column(
         children: [
-          // Message List
-          Expanded(
-            child: ListView.builder(
-              controller: _scrollController,
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-              itemCount: _provider.messages.length,
-              itemBuilder: (context, index) {
-                final msg = _provider.messages[index];
-                final isMe = msg.sender == _provider.currentUsername;
-                return MessageBubble(message: msg, isMe: isMe);
-              },
-            ),
-          ),
+          const MessageList(),
 
-          // Typing Indicator
-          // Typing indicator from provider
-          if (_provider.typingStatusText != null)
-            Padding(
-              padding: const EdgeInsets.only(left: 20, bottom: 10),
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.9),
-                    borderRadius: BorderRadius.circular(16),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.04),
-                        blurRadius: 2,
-                        offset: const Offset(0, 1),
-                      ),
-                    ],
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: const [
-                      SizedBox(
-                        width: 10,
-                        height: 10,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 1.5,
-                          color: Color(0xFF008069),
-                        ),
-                      ),
-                      SizedBox(width: 8),
-                      // The provider supplies the status text
-                      // This placeholder will be replaced by the actual text via Consumer below.
-                    ],
-                  ),
-                ),
-              ),
-            ),
+          TypingIndicator(provider: _provider),
 
           // Input Area
-          _buildInputArea(),
+          const ChatInputArea(),
         ],
       ),
     ));

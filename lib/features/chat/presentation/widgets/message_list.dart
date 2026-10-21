@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
-import '../../provider/chat_provider.dart';
-import '../widgets/message_bubble.dart';
-
-
 import 'package:provider/provider.dart';
-import '../../provider/chat_provider.dart';
+import '../provider/chat_provider.dart';
+import '../widgets/message_bubble.dart';
 
 /// Displays the list of chat messages.
 class MessageList extends StatelessWidget {

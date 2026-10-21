@@ -9,7 +9,7 @@ class ChatInputArea extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<ChatProvider>(context);
-    final controller = TextEditingController(text: provider.currentInput);
+    final controller = TextEditingController();
     // Keep cursor at end after updates.
     controller.selection = TextSelection.fromPosition(
       TextPosition(offset: controller.text.length),
