@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../../../../core/service_locator.dart';
 import '../provider/chat_provider.dart';
 import '../widgets/message_bubble.dart';
+import '../widgets/message_list.dart';
 
 class ChatPage extends StatefulWidget {
   // 1. UPDATE: Add username field

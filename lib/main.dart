@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'core/service_locator.dart' as di;
+import 'core/theme.dart';
 import 'features/chat/presentation/pages/login_page.dart'; // 1. Import Login Page
 
 void main() {
@@ -17,10 +18,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Flutter Socket MVP',
-      theme: ThemeData(
-        primarySwatch: Colors.teal,
-        useMaterial3: true,
-      ),
+      theme: appTheme,
       // 2. Set Login Page as the starting screen
       home: const LoginPage(),
     );

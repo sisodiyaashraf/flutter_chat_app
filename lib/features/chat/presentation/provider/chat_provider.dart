@@ -84,11 +84,14 @@ class ChatProvider extends ChangeNotifier {
     });
   }
 
+  final ScrollController scrollController = ScrollController();
+
   @override
   void dispose() {
     _debounceTimer?.cancel();
     _msgSub?.cancel();
     _typingSub?.cancel();
+    scrollController.dispose();
     _repository.disconnect();
     super.dispose();
   }
