@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../provider/chat_provider.dart';
+import '../provider/chat_provider.dart';
 
 /// Shows typing indicator when another user is typing.
 class TypingIndicator extends StatelessWidget {
@@ -17,11 +17,11 @@ class TypingIndicator extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.9),
+            color: Colors.white.withAlpha((0.9 * 255).round()),
             borderRadius: BorderRadius.circular(16),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.04),
+                color: Colors.black.withAlpha((0.04 * 255).round()),
                 blurRadius: 2,
                 offset: const Offset(0, 1),
               ),

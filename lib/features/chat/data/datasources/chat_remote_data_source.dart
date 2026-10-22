@@ -3,7 +3,7 @@ import 'dart:convert'; // For JSON decoding
 import 'package:flutter/foundation.dart'; // For debugPrint and kDebugMode
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'package:uuid/uuid.dart';
-import '../../../core/config.dart';
+import '../../../../core/config.dart';
 import '../models/message_model.dart';
 
 abstract class ChatRemoteDataSource {

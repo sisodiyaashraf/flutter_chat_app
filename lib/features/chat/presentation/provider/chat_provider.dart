@@ -1,10 +1,9 @@
 import 'dart:async';
-import 'package:flutter/foundation.dart';
+
+import 'package:flutter/widgets.dart'; // for ScrollController
 import '../../domain/entities/message_entity.dart';
 import '../../domain/repositories/chat_repository.dart';
 import '../../domain/usecases/send_message.dart';
-import '../../domain/usecases/listen_messages.dart';
-import '../../domain/usecases/typing_status.dart';
 
 /// ChatProvider replaces the old MVP presenter.
 /// It manages socket connection, message streams, typing events,
@@ -12,8 +11,8 @@ import '../../domain/usecases/typing_status.dart';
 class ChatProvider extends ChangeNotifier {
   final ChatRepository _repository;
   final SendMessage _sendMessage;
-  final ListenMessages _listenMessages;
-  final TypingStatus _typingStatus;
+
+
 
   // UI state
   final List<MessageEntity> _messages = [];
@@ -32,9 +31,8 @@ class ChatProvider extends ChangeNotifier {
 
   ChatProvider({required ChatRepository repository})
       : _repository = repository,
-        _sendMessage = SendMessage(repository),
-        _listenMessages = ListenMessages(repository),
-        _typingStatus = TypingStatus(repository);
+        _sendMessage = SendMessage(repository);
+
 
   /// Initialise the chat with the logged‑in username.
   void initChat(String username) {
@@ -71,16 +69,26 @@ class ChatProvider extends ChangeNotifier {
     if (text.trim().isEmpty || _currentUsername == null) return;
     _sendMessage.execute(text, _currentUsername!);
     // Reset typing flag.
-    _typingStatus.execute(isTyping: false);
+    if (_currentUsername != null) {
+      _repository.sendTyping(false, _currentUsername!);
+    }
   }
 
   /// Debounced typing notification.
   Timer? _debounceTimer;
+  String _currentInput = '';
+  String get currentInput => _currentInput;
+
   void onTextChanged(String text) {
-    _typingStatus.execute(isTyping: true);
+    _currentInput = text;
+    if (_currentUsername != null) {
+      _repository.sendTyping(true, _currentUsername!);
+    }
     _debounceTimer?.cancel();
     _debounceTimer = Timer(const Duration(milliseconds: 300), () {
-      _typingStatus.execute(isTyping: false);
+      if (_currentUsername != null) {
+        _repository.sendTyping(false, _currentUsername!);
+      }
     });
   }
 

@@ -3,17 +3,39 @@ import 'package:provider/provider.dart';
 import '../provider/chat_provider.dart';
 
 /// Input area widget for sending messages.
-class ChatInputArea extends StatelessWidget {
+class ChatInputArea extends StatefulWidget {
   const ChatInputArea({super.key});
+
+  @override
+  State<ChatInputArea> createState() => _ChatInputAreaState();
+}
+
+class _ChatInputAreaState extends State<ChatInputArea> {
+  late final TextEditingController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    final provider = Provider.of<ChatProvider>(context, listen: false);
+    _controller = TextEditingController(text: provider.currentInput);
+    // Listen to changes to keep provider in sync.
+    _controller.addListener(() {
+      Provider.of<ChatProvider>(context, listen: false)
+          .onTextChanged(_controller.text);
+      setState(() {}); // Update UI for send button enable/disable.
+    });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<ChatProvider>(context);
-    final controller = TextEditingController();
-    // Keep cursor at end after updates.
-    controller.selection = TextSelection.fromPosition(
-      TextPosition(offset: controller.text.length),
-    );
+    final isEmpty = _controller.text.trim().isEmpty;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
       decoration: BoxDecoration(
@@ -45,8 +67,7 @@ class ChatInputArea extends StatelessWidget {
                     ),
                     Expanded(
                       child: TextField(
-                        controller: controller,
-                        onChanged: provider.onTextChanged,
+                        controller: _controller,
                         decoration: const InputDecoration(
                           hintText: "Type a message...",
                           border: InputBorder.none,
@@ -60,14 +81,16 @@ class ChatInputArea extends StatelessWidget {
             ),
             const SizedBox(width: 8),
             GestureDetector(
-              onTap: () {
-                provider.sendMessage(controller.text);
-                controller.clear();
-              },
+              onTap: isEmpty
+                  ? null
+                  : () {
+                      provider.sendMessage(_controller.text);
+                      _controller.clear();
+                    },
               child: Container(
                 padding: const EdgeInsets.all(12),
-                decoration: const BoxDecoration(
-                  color: Color(0xFF008069),
+                decoration: BoxDecoration(
+                  color: isEmpty ? Colors.grey[400] : const Color(0xFF008069),
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(Icons.send, color: Colors.white, size: 18),

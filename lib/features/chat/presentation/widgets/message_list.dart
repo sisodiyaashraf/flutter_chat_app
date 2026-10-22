@@ -10,6 +10,16 @@ class MessageList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<ChatProvider>(context);
+    // Auto‑scroll to the bottom when new messages arrive
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (provider.scrollController.hasClients) {
+        provider.scrollController.animateTo(
+          provider.scrollController.position.maxScrollExtent,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOut,
+        );
+      }
+    });
     return Expanded(
       child: ListView.builder(
         controller: provider.scrollController,
