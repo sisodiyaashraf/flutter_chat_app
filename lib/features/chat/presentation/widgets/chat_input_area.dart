@@ -20,8 +20,10 @@ class _ChatInputAreaState extends State<ChatInputArea> {
     _controller = TextEditingController(text: provider.currentInput);
     // Listen to changes to keep provider in sync.
     _controller.addListener(() {
-      Provider.of<ChatProvider>(context, listen: false)
-          .onTextChanged(_controller.text);
+      Provider.of<ChatProvider>(
+        context,
+        listen: false,
+      ).onTextChanged(_controller.text);
       setState(() {}); // Update UI for send button enable/disable.
     });
   }
@@ -62,7 +64,10 @@ class _ChatInputAreaState extends State<ChatInputArea> {
                 child: Row(
                   children: [
                     IconButton(
-                      icon: const Icon(Icons.emoji_emotions_outlined, color: Colors.grey),
+                      icon: const Icon(
+                        Icons.emoji_emotions_outlined,
+                        color: Colors.grey,
+                      ),
                       onPressed: () {},
                     ),
                     Expanded(
