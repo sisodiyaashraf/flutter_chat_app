@@ -23,7 +23,7 @@ class ChatProvider extends ChangeNotifier {
   String? get currentUsername => _currentUsername;
 
   // Connection state
-  bool _isConnected = false;
+  final bool _isConnected = false;
   bool get isConnected => _isConnected;
 
   StreamSubscription<MessageEntity>? _msgSub;

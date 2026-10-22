@@ -73,7 +73,7 @@ class _LoginPageState extends State<LoginPage> {
                 borderRadius: BorderRadius.circular(24),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.15),
+                    color: Colors.black.withAlpha(38),
                     blurRadius: 25,
                     offset: const Offset(0, 12),
                   )
@@ -86,7 +86,7 @@ class _LoginPageState extends State<LoginPage> {
                   Container(
                     padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF008069).withOpacity(0.08),
+                      color: const Color(0xFF008069).withAlpha(20),
                       shape: BoxShape.circle,
                     ),
                     child: const Icon(

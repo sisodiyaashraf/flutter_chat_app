@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:convert'; // For JSON decoding
 import 'package:flutter/foundation.dart'; // For debugPrint and kDebugMode
-import 'package:socket_io_client/socket_io_client.dart' as IO;
+import 'package:socket_io_client/socket_io_client.dart' as io;
 import 'package:uuid/uuid.dart';
 import '../../../../core/config.dart';
 import '../models/message_model.dart';
@@ -16,7 +16,7 @@ abstract class ChatRemoteDataSource {
 }
 
 class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
-  late IO.Socket _socket;
+  late io.Socket _socket;
   final _messageController = StreamController<MessageModel>.broadcast();
   final _typingController = StreamController<Map<String, dynamic>>.broadcast();
 
@@ -30,7 +30,7 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
   void connect() {
     if (kDebugMode) debugPrint('🔄 Connecting to Python Server...');
 
-    _socket = IO.io(AppConfig.serverUrl, IO.OptionBuilder()
+    _socket = io.io(AppConfig.serverUrl, io.OptionBuilder()
         .setTransports(['websocket'])
         .disableAutoConnect()
         .build());
@@ -103,7 +103,7 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
   void disconnect() {
     try {
       if (_socket.connected) _socket.disconnect();
-    } catch (e) {}
+    } catch (e) { if (kDebugMode) debugPrint('❌ Disconnect error: $e'); }
     // Do NOT close stream controllers here; they are managed by the repository/provider lifecycle.
   }
 }
