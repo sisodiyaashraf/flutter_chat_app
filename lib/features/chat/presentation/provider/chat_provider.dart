@@ -64,6 +64,16 @@ class ChatProvider extends ChangeNotifier {
   /// Send a message (optimistic UI handled by UI layer).
   void sendMessage(String text) {
     if (text.trim().isEmpty || _currentUsername == null) return;
+    // Optimistically add the sent message to the local list.
+    final optimisticMessage = MessageEntity(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      text: text,
+      sender: _currentUsername!,
+      time: DateTime.now(),
+    );
+    _messages.add(optimisticMessage);
+    notifyListeners();
+    // Execute actual send.
     _sendMessage.execute(text, _currentUsername!);
     // Reset typing flag.
     if (_currentUsername != null) {
