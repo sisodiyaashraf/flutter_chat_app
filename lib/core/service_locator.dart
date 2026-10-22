@@ -12,11 +12,11 @@ void init() {
 
   // 2. Repository
   sl.registerLazySingleton<ChatRepository>(
-        () => ChatRepositoryImpl(remoteDataSource: sl()),
+    () => ChatRepositoryImpl(remoteDataSource: sl()),
   );
 
   // 3. Data Source
   sl.registerLazySingleton<ChatRemoteDataSource>(
-        () => ChatRemoteDataSourceImpl(),
+    () => ChatRemoteDataSourceImpl(),
   );
 }

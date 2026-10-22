@@ -1,5 +1,4 @@
 import '../../domain/repositories/chat_repository.dart';
-import '../../domain/entities/message_entity.dart';
 
 class SendMessage {
   final ChatRepository _repository;

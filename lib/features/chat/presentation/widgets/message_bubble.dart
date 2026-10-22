@@ -6,11 +6,7 @@ class MessageBubble extends StatelessWidget {
   final MessageEntity message;
   final bool isMe;
 
-  const MessageBubble({
-    super.key,
-    required this.message,
-    required this.isMe,
-  });
+  const MessageBubble({super.key, required this.message, required this.isMe});
 
   Color _getColorFromName(String name) {
     final int hash = name.codeUnits.fold(0, (prev, element) => prev + element);
@@ -29,13 +25,19 @@ class MessageBubble extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final avatarColor = !isMe ? _getColorFromName(message.sender) : Colors.transparent;
-    final initials = !isMe && message.sender.isNotEmpty ? message.sender[0].toUpperCase() : '';
+    final avatarColor = !isMe
+        ? _getColorFromName(message.sender)
+        : Colors.transparent;
+    final initials = !isMe && message.sender.isNotEmpty
+        ? message.sender[0].toUpperCase()
+        : '';
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
       child: Row(
-        mainAxisAlignment: isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
+        mainAxisAlignment: isMe
+            ? MainAxisAlignment.end
+            : MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           if (!isMe) ...[
@@ -72,7 +74,7 @@ class MessageBubble extends StatelessWidget {
                     color: Colors.black.withOpacity(0.04),
                     blurRadius: 2,
                     offset: const Offset(0, 1),
-                  )
+                  ),
                 ],
               ),
               child: Column(

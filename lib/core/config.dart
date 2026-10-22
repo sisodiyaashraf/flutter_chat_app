@@ -10,7 +10,10 @@ class AppConfig {
       return 'http://127.0.0.1:5000';
     } else {
       // Default to localhost; developers can override via environment variable.
-      return const String.fromEnvironment('SERVER_URL', defaultValue: 'http://localhost:5000');
+      return const String.fromEnvironment(
+        'SERVER_URL',
+        defaultValue: 'http://localhost:5000',
+      );
     }
   }
 }

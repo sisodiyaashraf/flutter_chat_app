@@ -12,8 +12,6 @@ class ChatProvider extends ChangeNotifier {
   final ChatRepository _repository;
   final SendMessage _sendMessage;
 
-
-
   // UI state
   final List<MessageEntity> _messages = [];
   List<MessageEntity> get messages => List.unmodifiable(_messages);
@@ -30,9 +28,8 @@ class ChatProvider extends ChangeNotifier {
   StreamSubscription<Map<String, dynamic>>? _typingSub;
 
   ChatProvider({required ChatRepository repository})
-      : _repository = repository,
-        _sendMessage = SendMessage(repository);
-
+    : _repository = repository,
+      _sendMessage = SendMessage(repository);
 
   /// Initialise the chat with the logged‑in username.
   void initChat(String username) {
