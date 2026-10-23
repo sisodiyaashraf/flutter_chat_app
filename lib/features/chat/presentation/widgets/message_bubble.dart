@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../domain/entities/message_entity.dart';
+import '../../../../core/theme.dart';
 
 class MessageBubble extends StatelessWidget {
   final MessageEntity message;
@@ -61,22 +62,7 @@ class MessageBubble extends StatelessWidget {
                 maxWidth: MediaQuery.of(context).size.width * 0.72,
               ),
               padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-              decoration: BoxDecoration(
-                color: isMe ? const Color(0xFFDCF8C6) : Colors.white,
-                borderRadius: BorderRadius.only(
-                  topLeft: const Radius.circular(14),
-                  topRight: const Radius.circular(14),
-                  bottomLeft: isMe ? const Radius.circular(14) : Radius.zero,
-                  bottomRight: isMe ? Radius.zero : const Radius.circular(14),
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.04),
-                    blurRadius: 2,
-                    offset: const Offset(0, 1),
-                  ),
-                ],
-              ),
+              decoration: isMe ? AppTheme.outgoingBubbleDecoration : AppTheme.incomingBubbleDecoration,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,

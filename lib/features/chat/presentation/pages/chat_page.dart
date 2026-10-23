@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../../core/service_locator.dart';
+import '../../../../core/theme.dart';
 import '../provider/chat_provider.dart';
 
 import '../widgets/message_list.dart';
@@ -22,12 +23,9 @@ class _ChatPageState extends State<ChatPage> {
   // Dependency Injection
   late final ChatProvider _provider;
 
-
   // Controllers
 
-
   // State
-
 
   @override
   void initState() {
@@ -44,7 +42,6 @@ class _ChatPageState extends State<ChatPage> {
     super.dispose();
   }
 
-
   // --- Provider‑driven UI ---
   // No longer implements ChatView; UI reacts to provider changes via Consumer.
 
@@ -54,51 +51,55 @@ class _ChatPageState extends State<ChatPage> {
   Widget build(BuildContext context) {
     return ChangeNotifierProvider.value(
       value: _provider,
-      child: Scaffold(
-      backgroundColor: const Color(0xFFEFE7DE), // Chat Background Color
-      appBar: AppBar(
-        elevation: 1,
-        backgroundColor: const Color(0xFF008069), // Teal Color
-        foregroundColor: Colors.white,
-        leading: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: CircleAvatar(
-            backgroundColor: Colors.white24,
-            child: const Icon(Icons.person, color: Colors.white),
+      child: Container(
+        decoration: const BoxDecoration(
+          gradient: AppTheme.chatBackgroundGradient,
+        ),
+        child: Scaffold(
+          backgroundColor: Colors.transparent,
+          appBar: AppBar(
+            elevation: 1,
+            backgroundColor: const Color(0xFF008069), // Teal Color
+            foregroundColor: Colors.white,
+            leading: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: CircleAvatar(
+                backgroundColor: Colors.white24,
+                child: const Icon(Icons.person, color: Colors.white),
+              ),
+            ),
+            title: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  "Flutter Chat",
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                // 4. Display the passed username or the one from presenter
+                Text(
+                  widget.username,
+                  style: const TextStyle(fontSize: 12, color: Colors.white70),
+                ),
+              ],
+            ),
+            actions: [
+              IconButton(onPressed: () {}, icon: const Icon(Icons.videocam)),
+              IconButton(onPressed: () {}, icon: const Icon(Icons.call)),
+              IconButton(onPressed: () {}, icon: const Icon(Icons.more_vert)),
+            ],
+          ),
+          body: Column(
+            children: [
+              const MessageList(),
+
+              TypingIndicator(provider: _provider),
+
+              // Input Area
+              const ChatInputArea(),
+            ],
           ),
         ),
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              "Flutter Chat",
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            // 4. Display the passed username or the one from presenter
-            Text(
-              widget.username,
-              style: const TextStyle(fontSize: 12, color: Colors.white70),
-            )
-          ],
-        ),
-        actions: [
-          IconButton(onPressed: () {}, icon: const Icon(Icons.videocam)),
-          IconButton(onPressed: () {}, icon: const Icon(Icons.call)),
-          IconButton(onPressed: () {}, icon: const Icon(Icons.more_vert)),
-        ],
       ),
-      body: Column(
-        children: [
-          const MessageList(),
-
-          TypingIndicator(provider: _provider),
-
-          // Input Area
-          const ChatInputArea(),
-        ],
-      ),
-    ));
+    );
   }
-
-
 }
