@@ -85,7 +85,7 @@ class _ChatPageState extends State<ChatPage> {
             actions: [
               Icon(
                 Icons.circle,
-                color: provider.isConnected ? Colors.green : Colors.red,
+                color: _provider.isConnected ? Colors.green : Colors.red,
                 size: 12,
               ),
               IconButton(onPressed: () {}, icon: const Icon(Icons.videocam)),
