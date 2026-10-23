@@ -9,6 +9,7 @@ abstract class ChatRepository {
   void connect();
   void disconnect();
   void sendMessage(String text, String username);
+  bool get isConnected;
 
   // 2. ADD THIS: Function to tell server we are typing
   void sendTyping(bool isTyping, String username);

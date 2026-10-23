@@ -15,6 +15,9 @@ class ChatRepositoryImpl implements ChatRepository {
   Stream<Map<String, dynamic>> get typingStream => remoteDataSource.typingStream;
 
   @override
+  bool get isConnected => remoteDataSource.isConnected;
+
+  @override
   void connect() => remoteDataSource.connect();
 
   @override

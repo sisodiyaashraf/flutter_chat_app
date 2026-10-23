@@ -21,8 +21,7 @@ class ChatProvider extends ChangeNotifier {
   String? get currentUsername => _currentUsername;
 
   // Connection state
-  final bool _isConnected = false;
-  bool get isConnected => _isConnected;
+  bool get isConnected => _repository.isConnected;
 
   StreamSubscription<MessageEntity>? _msgSub;
   StreamSubscription<Map<String, dynamic>>? _typingSub;
@@ -64,6 +63,9 @@ class ChatProvider extends ChangeNotifier {
   /// Send a message (optimistic UI handled by UI layer).
   void sendMessage(String text) {
     if (text.trim().isEmpty || _currentUsername == null) return;
+    if (!_repository.isConnected) {
+      _repository.connect();
+    }
     // Optimistically add the sent message to the local list.
     final optimisticMessage = MessageEntity(
       id: DateTime.now().millisecondsSinceEpoch.toString(),

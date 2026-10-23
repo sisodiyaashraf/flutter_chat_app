@@ -11,6 +11,7 @@ abstract class ChatRemoteDataSource {
   Stream<Map<String, dynamic>> get typingStream;
   void connect();
   void disconnect();
+  bool get isConnected;
   void sendMessage(String text, String username);
   void sendTyping(bool isTyping, String username);
 }
@@ -24,7 +25,11 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
   Stream<MessageModel> get messageStream => _messageController.stream;
 
   @override
+  bool get isConnected => _socket.connected;
+
+  @override
   Stream<Map<String, dynamic>> get typingStream => _typingController.stream;
+
 
   @override
   void connect() {
@@ -80,6 +85,10 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
 
   @override
   void sendMessage(String text, String username) {
+    if (!_socket.connected) {
+      if (kDebugMode) debugPrint('🔄 Socket not connected, attempting to reconnect before sending message');
+      _socket.connect();
+    }
     final payload = {
       'id': const Uuid().v4(),
       'text': text,
