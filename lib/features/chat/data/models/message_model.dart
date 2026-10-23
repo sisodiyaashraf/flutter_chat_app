@@ -4,11 +4,11 @@ import 'package:uuid/uuid.dart';
 
 class MessageModel extends MessageEntity {
   const MessageModel({
-    required String id,
-    required String text,
-    required String sender,
-    required DateTime time,
-  }) : super(id: id, text: text, sender: sender, time: time);
+    required super.id,
+    required super.text,
+    required super.sender,
+    required super.time,
+  });
 
   factory MessageModel.fromJson(Map<String, dynamic> json) {
     return MessageModel(
