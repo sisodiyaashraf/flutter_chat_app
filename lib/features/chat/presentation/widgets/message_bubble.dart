@@ -91,7 +91,7 @@ class MessageBubble extends StatelessWidget {
                       DateFormat('hh:mm a').format(message.time),
                       style: TextStyle(
                         fontSize: 9,
-                        color: Colors.black.withOpacity(0.4),
+                        color: Colors.black.withAlpha(0x66),
                       ),
                     ),
                   ),
