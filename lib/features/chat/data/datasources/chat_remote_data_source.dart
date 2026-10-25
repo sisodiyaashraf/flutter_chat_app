@@ -30,15 +30,17 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
   @override
   Stream<Map<String, dynamic>> get typingStream => _typingController.stream;
 
-
   @override
   void connect() {
     if (kDebugMode) debugPrint('🔄 Connecting to Python Server...');
 
-    _socket = io.io(AppConfig.serverUrl, io.OptionBuilder()
-        .setTransports(['websocket'])
-        .disableAutoConnect()
-        .build());
+    _socket = io.io(
+      AppConfig.serverUrl,
+      io.OptionBuilder()
+          .setTransports(['websocket'])
+          .disableAutoConnect()
+          .build(),
+    );
 
     _socket.connect();
 
@@ -57,10 +59,12 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
         if (data is Map) {
           safeMap = Map<String, dynamic>.from(data);
         } else if (data is String) {
-          if (kDebugMode) debugPrint('⚠️ Received String, attempting to parse JSON...');
+          if (kDebugMode)
+            debugPrint('⚠️ Received String, attempting to parse JSON...');
           safeMap = jsonDecode(data);
         } else {
-          if (kDebugMode) debugPrint('⚠️ Unknown data type: ${data.runtimeType}');
+          if (kDebugMode)
+            debugPrint('⚠️ Unknown data type: ${data.runtimeType}');
           return;
         }
         final messageModel = MessageModel.fromJson(safeMap);
@@ -86,7 +90,10 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
   @override
   void sendMessage(String text, String username) {
     if (!_socket.connected) {
-      if (kDebugMode) debugPrint('🔄 Socket not connected, attempting to reconnect before sending message');
+      if (kDebugMode)
+        debugPrint(
+          '🔄 Socket not connected, attempting to reconnect before sending message',
+        );
       _socket.connect();
     }
     final payload = {
@@ -101,10 +108,7 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
   @override
   void sendTyping(bool isTyping, String username) {
     if (_socket.connected) {
-      _socket.emit('typing', {
-        'isTyping': isTyping,
-        'username': username,
-      });
+      _socket.emit('typing', {'isTyping': isTyping, 'username': username});
     }
   }
 
@@ -112,7 +116,9 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
   void disconnect() {
     try {
       if (_socket.connected) _socket.disconnect();
-    } catch (e) { if (kDebugMode) debugPrint('❌ Disconnect error: $e'); }
+    } catch (e) {
+      if (kDebugMode) debugPrint('❌ Disconnect error: $e');
+    }
     // Do NOT close stream controllers here; they are managed by the repository/provider lifecycle.
   }
 }

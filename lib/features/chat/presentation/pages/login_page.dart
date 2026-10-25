@@ -36,9 +36,7 @@ class _LoginPageState extends State<LoginPage> {
     // Navigate to ChatPage and pass the name
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(
-        builder: (context) => ChatPage(username: name),
-      ),
+      MaterialPageRoute(builder: (context) => ChatPage(username: name)),
     );
   }
 
@@ -76,7 +74,7 @@ class _LoginPageState extends State<LoginPage> {
                     color: Colors.black.withAlpha(38),
                     blurRadius: 25,
                     offset: const Offset(0, 12),
-                  )
+                  ),
                 ],
               ),
               child: Column(
@@ -118,20 +116,34 @@ class _LoginPageState extends State<LoginPage> {
                     textAlign: TextAlign.center,
                     textInputAction: TextInputAction.done,
                     onSubmitted: (_) => _joinChat(),
-                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                    ),
                     decoration: InputDecoration(
                       hintText: "Your Name (e.g. Ashraf)",
                       filled: true,
                       fillColor: Colors.grey[50],
-                      prefixIcon: const Icon(Icons.person_outline, color: Colors.grey),
-                      suffixIcon: const SizedBox(width: 48), // Keep text centered
+                      prefixIcon: const Icon(
+                        Icons.person_outline,
+                        color: Colors.grey,
+                      ),
+                      suffixIcon: const SizedBox(
+                        width: 48,
+                      ), // Keep text centered
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(16),
-                        borderSide: BorderSide(color: Colors.grey[200]!, width: 1.5),
+                        borderSide: BorderSide(
+                          color: Colors.grey[200]!,
+                          width: 1.5,
+                        ),
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(16),
-                        borderSide: const BorderSide(color: Color(0xFF008069), width: 1.5),
+                        borderSide: const BorderSide(
+                          color: Color(0xFF008069),
+                          width: 1.5,
+                        ),
                       ),
                       contentPadding: const EdgeInsets.symmetric(vertical: 18),
                     ),
@@ -154,7 +166,10 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                       child: const Text(
                         "Join Chat",
-                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
                   ),

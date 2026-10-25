@@ -1,7 +1,6 @@
 import '../../domain/entities/message_entity.dart';
 import 'package:uuid/uuid.dart';
 
-
 class MessageModel extends MessageEntity {
   const MessageModel({
     required super.id,
