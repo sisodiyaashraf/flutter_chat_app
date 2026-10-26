@@ -20,91 +20,81 @@ class ChatPage extends StatefulWidget {
 }
 
 class _ChatPageState extends State<ChatPage> {
-  // Dependency Injection
-  late final ChatProvider _provider;
-
-  // Controllers
-
-  // State
+  // Removed manual provider field; we will obtain the provider from the surrounding MultiProvider.
 
   @override
   void initState() {
     super.initState();
-    _provider = sl<ChatProvider>();
-    _provider.initChat(widget.username);
+    // Initialise chat after the first frame so that context is available.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<ChatProvider>(context, listen: false).initChat(widget.username);
+    });
   }
 
   @override
   void dispose() {
-    _provider.dispose();
-
-    // Provider handles scrollController disposal
+    // No explicit dispose needed; the Provider will dispose ChatProvider.
     super.dispose();
   }
 
-  // --- Provider‑driven UI ---
-  // No longer implements ChatView; UI reacts to provider changes via Consumer.
-
-  // ---------------------------
-
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider.value(
-      value: _provider,
-      child: Container(
-        decoration: const BoxDecoration(
-          gradient: AppTheme.chatBackgroundGradient,
-        ),
-        child: Scaffold(
-          backgroundColor: Colors.transparent,
-          appBar: AppBar(
-            elevation: 1,
-            backgroundColor: const Color(0xFF008069), // Teal Color
-            foregroundColor: Colors.white,
-            leading: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: CircleAvatar(
-                backgroundColor: Colors.white24,
-                child: const Icon(Icons.person, color: Colors.white),
+    return Consumer<ChatProvider>(
+      builder: (context, provider, child) {
+        return Container(
+          decoration: const BoxDecoration(
+            gradient: AppTheme.chatBackgroundGradient,
+          ),
+          child: Scaffold(
+            backgroundColor: Colors.transparent,
+            appBar: AppBar(
+              elevation: 1,
+              backgroundColor: const Color(0xFF008069), // Teal Color
+              foregroundColor: Colors.white,
+              leading: const Padding(
+                padding: EdgeInsets.all(8.0),
+                child: CircleAvatar(
+                  backgroundColor: Colors.white24,
+                  child: Icon(Icons.person, color: Colors.white),
+                ),
               ),
-            ),
-            title: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  "Flutter Chat",
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              title: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    "Flutter Chat",
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  Text(
+                    widget.username,
+                    style: const TextStyle(fontSize: 12, color: Colors.white70),
+                  ),
+                ],
+              ),
+              actions: [
+                Icon(
+                  Icons.circle,
+                  color: provider.isConnected ? Colors.green : Colors.red,
+                  size: 12,
                 ),
-                // 4. Display the passed username or the one from presenter
-                Text(
-                  widget.username,
-                  style: const TextStyle(fontSize: 12, color: Colors.white70),
-                ),
+                IconButton(onPressed: () {}, icon: const Icon(Icons.videocam)),
+                IconButton(onPressed: () {}, icon: const Icon(Icons.call)),
+                IconButton(onPressed: () {}, icon: const Icon(Icons.more_vert)),
               ],
             ),
-            actions: [
-              Icon(
-                Icons.circle,
-                color: _provider.isConnected ? Colors.green : Colors.red,
-                size: 12,
-              ),
-              IconButton(onPressed: () {}, icon: const Icon(Icons.videocam)),
-              IconButton(onPressed: () {}, icon: const Icon(Icons.call)),
-              IconButton(onPressed: () {}, icon: const Icon(Icons.more_vert)),
-            ],
+            body: Column(
+              children: const [
+                MessageList(),
+                // TypingIndicator will now read from the provider via Consumer.
+                // It can be passed the provider if needed.
+                // For simplicity we keep the widget unchanged.
+                TypingIndicator(provider: provider),
+                ChatInputArea(),
+              ],
+            ),
           ),
-          body: Column(
-            children: [
-              const MessageList(),
-
-              TypingIndicator(provider: _provider),
-
-              // Input Area
-              const ChatInputArea(),
-            ],
-          ),
-        ),
-      ),
+        );
+      },
     );
   }
 }
