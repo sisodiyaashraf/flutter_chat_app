@@ -21,27 +21,28 @@ class SessionProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void setUsername(String username) {
+  Future<void> setUsername(String username) async {
     if (_username != username) {
       _username = username;
-      LocalStorage.setString('username', username);
+      await LocalStorage.setString('username', username);
       notifyListeners();
     }
   }
 
-  void setServerUrl(String url) {
+  Future<void> setServerUrl(String url) async {
     if (_serverUrl != url) {
       _serverUrl = url;
-      LocalStorage.setString('serverUrl', url);
+      await LocalStorage.setString('serverUrl', url);
       notifyListeners();
     }
   }
 
-  void setRememberMe(bool value) {
+  Future<void> setRememberMe(bool value) async {
     if (_rememberMe != value) {
       _rememberMe = value;
-      LocalStorage.setBool('rememberMe', value);
+      await LocalStorage.setBool('rememberMe', value);
       notifyListeners();
     }
   }
+
 }

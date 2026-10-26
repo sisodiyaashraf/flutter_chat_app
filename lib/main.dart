@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'core/service_locator.dart' as di;
 import 'core/theme.dart';
-import 'features/chat/presentation/pages/login_page.dart'; // 1. Import Login Page
+// import 'features/chat/presentation/pages/login_page.dart'; // removed unused import
 import 'features/chat/presentation/provider/session_provider.dart';
 import 'features/chat/presentation/provider/chat_provider.dart';
+import 'features/chat/presentation/pages/startup_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -38,7 +39,7 @@ class MyApp extends StatelessWidget {
         title: 'Flutter Socket MVP',
         theme: appTheme,
         // 2. Set Login Page as the starting screen
-        home: const LoginPage(),
+        home: const StartupScreen(),
       ),
     );
   }

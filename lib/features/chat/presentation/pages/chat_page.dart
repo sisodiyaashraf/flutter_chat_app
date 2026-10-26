@@ -6,6 +6,7 @@ import '../provider/chat_provider.dart';
 import '../widgets/message_list.dart';
 import '../widgets/typing_indicator.dart';
 import '../widgets/chat_input_area.dart';
+import 'settings_page.dart';
 
 class ChatPage extends StatefulWidget {
   // 1. UPDATE: Add username field
@@ -78,7 +79,10 @@ class _ChatPageState extends State<ChatPage> {
                 ),
                 IconButton(onPressed: () {}, icon: const Icon(Icons.videocam)),
                 IconButton(onPressed: () {}, icon: const Icon(Icons.call)),
-                IconButton(onPressed: () {}, icon: const Icon(Icons.more_vert)),
+                IconButton(
+                  icon: const Icon(Icons.settings),
+                  onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const SettingsPage())),
+                ),
               ],
             ),
             body: Column(
