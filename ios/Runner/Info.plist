@@ -45,5 +45,14 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<!-- DEBUG ONLY: Allow plain HTTP connections to local development servers.
+	     ⚠️ Security trade-off: This disables App Transport Security (ATS),
+	     which normally forces HTTPS. In production, remove this block and
+	     serve your API over HTTPS to prevent man-in-the-middle attacks. -->
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsArbitraryLoads</key>
+		<true/>
+	</dict>
 </dict>
 </plist>

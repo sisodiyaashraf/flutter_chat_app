@@ -92,11 +92,11 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
   @override
   void sendMessage(String text, String username) {
     if (!_socket.connected) {
-    if (kDebugMode) {
-      debugPrint(
-        '🔄 Socket not connected, attempting to reconnect before sending message',
-      );
-    }
+      if (kDebugMode) {
+        debugPrint(
+          '🔄 Socket not connected, attempting to reconnect before sending message',
+        );
+      }
       _socket.connect();
     }
     final payload = {
