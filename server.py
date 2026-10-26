@@ -1,17 +1,22 @@
+import os
+from flask import Flask, send_from_directory
 import socketio
-import eventlet
 
-# 1. Create the Server
-# cors_allowed_origins='*' allows your Flutter app to connect from any IP
-sio = socketio.Server(cors_allowed_origins='*')
+# 1️⃣ Create Flask app
+app = Flask(__name__, static_folder='.', static_url_path='')
 
-# 2. Wrap it in a WSGI application (standard Python web app format)
-app = socketio.WSGIApp(sio)
+# 2️⃣ Create Socket.IO server with threading async mode
+sio = socketio.Server(cors_allowed_origins='*', async_mode='threading')
 
-print("🚀 Python Socket.IO Server running on port 5000...")
+# 3️⃣ Wrap with WSGI app
+socket_app = socketio.WSGIApp(sio, app)
 
-# --- EVENT HANDLERS ---
+# Serve the index.html at root
+@app.route('/')
+def index():
+    return send_from_directory('.', 'index.html')
 
+# ---------- Socket.IO event handlers ----------
 @sio.event
 def connect(sid, environ):
     print(f'✅ Client connected: {sid}')
@@ -24,21 +29,19 @@ def disconnect(sid):
 @sio.event
 def send_message(sid, data):
     print(f'📩 Received from {sid}: {data}')
+    # Broadcast to everyone EXCEPT the sender (skip_sid)
+    sio.emit('receive_message', data, skip_sid=sid)
 
-    # Broadcast 'receive_message' to ALL clients (including sender)
-    sio.emit('receive_message', data)
-
-# NEW: Listen for 'typing' status from Flutter
+# Listen for typing status
 @sio.event
 def typing(sid, data):
-    # data will be: {'isTyping': True} or {'isTyping': False}
-    # print(f"User {sid} is typing: {data['isTyping']}")
-
-    # Broadcast 'typing_status' to everyone EXCEPT the sender (skip_sid=sid)
-    # We don't want to see our own "typing..." indicator
+    # Broadcast to others (skip sender)
     sio.emit('typing_status', data, skip_sid=sid)
 
-# 3. Start the Server
+# 4️⃣ Start the server
 if __name__ == '__main__':
-    # Using port 5000 as established previously
-    eventlet.wsgi.server(eventlet.listen(('', 5000)), app)
+    port = int(os.getenv('PORT', 5000))
+    print(f'🚀 Python Socket.IO Server running on port {port}...')
+    # Using Werkzeug's built‑in development server with threading
+    from werkzeug.serving import run_simple
+    run_simple('0.0.0.0', port, socket_app, use_reloader=False, threaded=True)
