@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../../../core/service_locator.dart';
 import '../../../../core/theme.dart';
 import '../provider/chat_provider.dart';
 
@@ -83,7 +82,7 @@ class _ChatPageState extends State<ChatPage> {
               ],
             ),
             body: Column(
-              children: const [
+              children: [
                 MessageList(),
                 // TypingIndicator will now read from the provider via Consumer.
                 // It can be passed the provider if needed.
