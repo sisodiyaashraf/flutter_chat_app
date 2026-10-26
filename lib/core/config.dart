@@ -5,11 +5,7 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import 'dart:io' show Platform;
 
 class AppConfig {
-  static String _serverUrl = _defaultServerUrl();
-
-  static String get serverUrl => _serverUrl;
-
-  static set serverUrl(String url) => _serverUrl = url;
+  static String serverUrl = _defaultServerUrl();
 
   static String _defaultServerUrl() {
     if (kIsWeb) {
