@@ -2,13 +2,25 @@ import 'package:flutter/material.dart';
 
 /// Centralized app theme configuration.
 /// Uses Material 3 and a seed color to generate a cohesive color scheme.
+// Premium palette
+const Color kTealPrimary = Color(0xFF008069);
+const Color kAmberAccent = Color(0xFFFFB300);
+const Color kDeepPurple = Color(0xFF3A1C71);
+const Color kSoftPinkRed = Color(0xFFd76d77);
+const Color kWarmOrange = Color(0xFFffaf7b);
+
 final ThemeData appTheme = ThemeData(
   colorScheme: ColorScheme.fromSeed(
-    seedColor: const Color(0xFF008069), // Teal seed matching existing UI
+    seedColor: kTealPrimary,
     brightness: Brightness.light,
   ),
   useMaterial3: true,
-  // You can add further theme customizations (e.g., textTheme) here.
+  // Custom text theme for premium look
+  textTheme: const TextTheme(
+    headlineSmall: TextStyle(fontSize: 20, fontWeight: FontWeight.w600, color: kTealPrimary),
+    bodyMedium: TextStyle(fontSize: 15, color: Colors.black87),
+  ),
+  // You can add further theme customizations here.
 );
 
 // ----------------------------------------------------------------------
