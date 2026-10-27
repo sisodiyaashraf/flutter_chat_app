@@ -81,7 +81,7 @@ class _ChatPageState extends State<ChatPage> {
                 IconButton(onPressed: () {}, icon: const Icon(Icons.call)),
                 IconButton(
                   icon: const Icon(Icons.settings),
-                  onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const SettingsPage())),
+                                     onPressed: () => Navigator.of(context).push(_createSettingsRoute()),
                 ),
               ],
             ),
@@ -91,12 +91,25 @@ class _ChatPageState extends State<ChatPage> {
                 // TypingIndicator will now read from the provider via Consumer.
                 // It can be passed the provider if needed.
                 // For simplicity we keep the widget unchanged.
-                TypingIndicator(provider: provider),
+                const TypingIndicator(),
                 ChatInputArea(),
               ],
             ),
           ),
         );
+      },
+    );
+  }
+  // Helper to create a slide‑in route for Settings page with a smooth transition.
+  Route _createSettingsRoute() {
+    return PageRouteBuilder(
+      pageBuilder: (context, animation, secondaryAnimation) => const SettingsPage(),
+      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+        const begin = Offset(1.0, 0.0);
+        const end = Offset.zero;
+        const curve = Curves.easeInOut;
+        var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+        return SlideTransition(position: animation.drive(tween), child: child);
       },
     );
   }
