@@ -11,8 +11,8 @@ class TypingIndicator extends StatelessWidget {
     final status = Provider.of<ChatProvider>(context).typingStatusText;
     // early return removed; AnimatedSwitcher will handle null
     return AnimatedSwitcher(
-      duration: const Duration(milliseconds: 300),
-      transitionBuilder: (child, animation) => FadeTransition(opacity: animation, child: child),
+      duration: Duration.zero,
+      transitionBuilder: (child, animation) => child,
       child: status == null
           ? const SizedBox.shrink(key: ValueKey('empty'))
           : Padding(
@@ -39,9 +39,10 @@ class TypingIndicator extends StatelessWidget {
                       const SizedBox(
                         width: 10,
                         height: 10,
-                        child: CircularProgressIndicator(
+                        child: const CircularProgressIndicator(
                           strokeWidth: 1.5,
                           color: Color(0xFF008069),
+                          value: 1.0,
                         ),
                       ),
                       const SizedBox(width: 8),
