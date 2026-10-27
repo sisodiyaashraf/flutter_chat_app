@@ -106,10 +106,10 @@ void main() {
 
       // Remove status.
       mockProvider.setTypingStatus(null);
-      await tester.pump();
-      await tester.pump(const Duration(milliseconds: 150));
-      expect(find.byType(CircularProgressIndicator), findsNothing);
-      await tester.pumpAndSettle();
+      await tester.pump(); // start transition back to empty
+      await tester.pump(const Duration(milliseconds: 300)); // wait for animation
+      expect(find.byKey(const ValueKey('empty')), findsOneWidget);
+      expect(find.byKey(const ValueKey('typing')), findsNothing);
     });
   });
 }
